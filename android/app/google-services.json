@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "956212101742",
+    "firebase_url": "https://question-reminders.firebaseio.com",
+    "project_id": "question-reminders",
+    "storage_bucket": "question-reminders.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956212101742:android:c41e11012a7a3468ef9c7f",
+        "android_client_info": {
+          "package_name": "com.example.question_reminders"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956212101742-ik3pjho36khbv5etp8g1i0kv4gqcsnp7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7wBsHGrjvOL5lmBkAV3EGAwOcdAFCwVM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956212101742-ik3pjho36khbv5etp8g1i0kv4gqcsnp7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
