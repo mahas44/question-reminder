@@ -1,4 +1,4 @@
-package com.example.question_reminders
+package com.sor_bakalim
 
 import io.flutter.embedding.android.FlutterActivity
 

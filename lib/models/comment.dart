@@ -7,6 +7,8 @@ class Comment {
   final String createdBy;
   final String creatorUsername;
   final String creatorImage;
+  final int score;
+  List<String> scoredBy;
 
   Comment({
     @required this.id,
@@ -15,6 +17,8 @@ class Comment {
     @required this.createdBy,
     @required this.creatorUsername,
     @required this.creatorImage,
+    this.score = 0,
+    this.scoredBy,
   });
 
   Comment.fromJson(Map<String, dynamic> parsedJson)
@@ -23,7 +27,10 @@ class Comment {
         createdAt = parsedJson["createdAt"],
         createdBy = parsedJson["createdBy"],
         creatorUsername = parsedJson["creatorUsername"],
-        creatorImage = parsedJson["creatorImage"];
+        creatorImage = parsedJson["creatorImage"],
+        score = parsedJson["score"],
+        scoredBy = parsedJson["scoredBy"];
+        
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -32,5 +39,9 @@ class Comment {
         "createdBy": createdBy,
         "creatorUsername": creatorUsername,
         "creatorImage": creatorImage,
+        "score": score,
+        "scoredBy": scoredBy,
       };
+
+
 }

@@ -8,8 +8,8 @@ import 'package:question_reminders/providers/comment_provider.dart';
 import 'package:question_reminders/widgets/accent_color_override.dart';
 
 class NewComment extends StatefulWidget {
-  final String questionId;
-  NewComment(this.questionId);
+  final String questionDocumentID, questionId;
+  NewComment(this.questionDocumentID, this.questionId);
 
   @override
   _NewCommentsState createState() => _NewCommentsState();
@@ -33,10 +33,12 @@ class _NewCommentsState extends State<NewComment> {
       createdBy: user.uid,
       creatorUsername: userData["username"],
       creatorImage: userData["imageUrl"],
+      scoredBy: ["${user.uid}"],
+      score: 0,
     );
 
     Provider.of<CommentProvider>(context, listen: false)
-        .addComment(comment, widget.questionId);
+        .addComment(comment, widget.questionDocumentID, widget.questionId);
 
     _enteredMessage = "";
     _controller.clear();
@@ -62,7 +64,7 @@ class _NewCommentsState extends State<NewComment> {
                 textCapitalization: TextCapitalization.sentences,
                 autocorrect: true,
                 enableSuggestions: true,
-                decoration: InputDecoration(labelText: "Send a comment"),
+                decoration: InputDecoration(labelText: "Yorum veya cevap yaz"),
                 onChanged: (value) {
                   setState(() {
                     _enteredMessage = value;

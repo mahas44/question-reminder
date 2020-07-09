@@ -3,6 +3,7 @@ import 'package:question_reminders/constant.dart';
 import '../widgets/exam_item.dart';
 
 class HomeScreen extends StatelessWidget {
+  static const routeName = "/home";
   @override
   Widget build(BuildContext context) {
     return GridView(

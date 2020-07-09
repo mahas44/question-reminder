@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:question_reminders/widgets/questions.dart';
+import 'package:question_reminders/widgets/question_list.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   static const routeName = "/profile";
 
-  @override
-  _ProfileScreenState createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        child: Questions(
+        child: QuestionList(
           type: "my",
           selectedFilter: "my",
         ),

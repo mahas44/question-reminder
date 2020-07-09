@@ -16,7 +16,7 @@ NotificationAppLaunchDetails notificationAppLaunchDetails;
 
   void initNotifications() {
     var initializationSettingAndroid =
-        AndroidInitializationSettings("@mipmap/ic_launcher");
+        AndroidInitializationSettings("@drawable/icon");
     var initializationSettingIOS = IOSInitializationSettings(
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     var initializationSettings = InitializationSettings(
@@ -28,15 +28,14 @@ NotificationAppLaunchDetails notificationAppLaunchDetails;
 
   void showNotifitions(int id, String title, String body, DateTime dateTime) async{
     await flutterLocalNotificationsPlugin.schedule(id, title, body, dateTime, getPlatformChannelSpecfics());
-    print('Notification Succesfully Scheduled at ${dateTime.toString()}');
   }
 
   getPlatformChannelSpecfics() {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
+        'Sor_Bakalım', 'Sor Bakalım', 'Soru hatırlatma bildirim kanalı',
         importance: Importance.Max,
         priority: Priority.High,
-        ticker: 'Question Reminder');
+        ticker: 'Sor Bakalım');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);

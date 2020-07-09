@@ -45,10 +45,21 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
     });
   }
 
-  void _saveQuestion() {
+  var connectionStatus;
+  void _saveQuestion(BuildContext context) {
     if (_descriptionController.text.isEmpty || _pickedImage == null) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Konu metni eklediğinizden ve soru resmini seçtiğinizden emin olun.",
+            style: TextStyle(fontSize: 16, color: Colors.white),
+          ),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
       return;
     }
+
     var dateTime = Timestamp.now().millisecondsSinceEpoch;
     var question = Question(
       id: dateTime.toString(),
@@ -73,62 +84,66 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
         appBar: AppBar(
           title: Text("Yeni Soru Ekle"),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 32, 16, 16),
-                  child: Column(
-                    children: [
-                      AccentColorOverride(
-                        color: kShrineBrown900,
-                        child: TextField(
-                          decoration: InputDecoration(labelText: "Açıklama", border: OutlineInputBorder()),
-                          controller: _descriptionController,
+        body: Builder(
+          builder: (context) => Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    child: Column(
+                      children: [
+                        AccentColorOverride(
+                          color: kShrineBrown900,
+                          child: TextField(
+                            maxLength: 40,
+                            decoration: InputDecoration(
+                                hintText:
+                                    "örn: üçgende açılar, anlatım bozukluğu vs.",
+                                labelText: "Konu",
+                                border: OutlineInputBorder()),
+                            controller: _descriptionController,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          MyDropDownButton(
-                            Exams.keys.toList(),
-                            _selectClazz,
-                            true,
-                            onChangeLessonList: _changeLessonList,
-                          ),
-                          MyDropDownButton(
-                            lessonList,
-                            _selectLesson,
-                            false,
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ImageInput(_selectImage),
-                    ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            MyDropDownButton(
+                              Exams.keys.toList(),
+                              _selectClazz,
+                              true,
+                              onChangeLessonList: _changeLessonList,
+                            ),
+                            MyDropDownButton(
+                              lessonList,
+                              _selectLesson,
+                              false,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8,),
+                        ImageInput(_selectImage),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            RaisedButton.icon(
-              onPressed: _saveQuestion,
-              icon: Icon(Icons.add),
-              label: Text("Soru Ekle"),
-              elevation: 8,
-              textColor: Theme.of(context).accentColor,
-              materialTapTargetSize: MaterialTapTargetSize.padded,
-            ),
-          ],
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: RaisedButton.icon(
+                  onPressed: () => _saveQuestion(context),
+                  icon: Icon(Icons.add),
+                  label: Text("Soru Ekle"),
+                  elevation: 8,
+                  textColor: Theme.of(context).accentColor,
+                  materialTapTargetSize: MaterialTapTargetSize.padded,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-

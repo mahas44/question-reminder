@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import '../models/comment.dart';
 
 class CommentProvider with ChangeNotifier {
-  Future<void> addComment(Comment comment, questionId) async {
+  Future<void> addComment(Comment comment, questionDocumentID, questionId) async {
     try {
       await Firestore.instance
           .collection("questions")
-          .document(questionId)
+          .document(questionDocumentID)
           .collection("comments")
           .add(comment.toJson());
     } on PlatformException catch (e) {
@@ -23,26 +23,27 @@ class CommentProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteComment(commentId, questionId) async {
+  Future<void> deleteComment(commentDocumentId, questionDocumentID, commentId) async {
     try {
       await Firestore.instance
           .collection("questions")
-          .document(questionId)
+          .document(questionDocumentID)
           .collection("comments")
-          .document(commentId)
+          .document(commentDocumentId)
           .delete();
     } catch (e) {
       throw e;
     }
   }
 
-  Stream<QuerySnapshot> getComments(questionId) {
+  Stream<QuerySnapshot> getComments(questionDocumentID) {
     try {
       final allDocs = Firestore.instance
           .collection("questions")
-          .document(questionId)
+          .document(questionDocumentID)
           .collection("comments")
-          .orderBy("createdAt")
+          .orderBy("score", descending: true)
+          .orderBy("createdAt", descending: true)
           .snapshots();
       return allDocs;
     } catch (e) {

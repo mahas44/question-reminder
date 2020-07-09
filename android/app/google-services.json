@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:956212101742:android:c41e11012a7a3468ef9c7f",
+        "mobilesdk_app_id": "1:956212101742:android:66252c0934f2b413ef9c7f",
         "android_client_info": {
-          "package_name": "com.example.question_reminders"
+          "package_name": "com.sor_bakalim"
         }
       },
       "oauth_client": [
