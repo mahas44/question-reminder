@@ -3,55 +3,47 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:question_reminders/helpers/db_helper.dart';
 import '../models/question.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 class QuestionProvider with ChangeNotifier {
-  List<Question> _items = [];
-
-  List<Question> get items {
-    return [..._items];
-  }
-
-  Future<void> addQuestion(Question question) async {
+  Future<void> addQuestion(Question question, File imageFile) async {
     try {
-      final user = await FirebaseAuth.instance.currentUser();
-      final userData = await Firestore.instance.collection("users").document(user.uid).get();
+      final fileName = Timestamp.now().nanoseconds.toString();
       final ref = FirebaseStorage.instance
           .ref()
           .child("question_images")
-          .child(user.uid)
-          .child(Timestamp.now().nanoseconds.toString() + ".jpg");
+          .child(question.creatorId)
+          .child(fileName);
 
-      await ref.putFile(question.imageFile).onComplete;
+      await ref.putFile(imageFile).onComplete;
 
       final url = await ref.getDownloadURL();
 
-      _items.add(Question.fromJson(
-          question.toJsonForFirestore(url, user.uid, userData["username"])));
-      notifyListeners();
-      DBHelper.insert("questions", question.toJsonLocal(url, user.uid, userData["username"]));
-
-      await Firestore.instance
-          .collection("questions")
-          .add(question.toJsonForFirestore(url, user.uid, userData["username"]));
+      await Firestore.instance.collection("questions").add(
+          question.toJsonForFirestore(
+              url, question.creatorId, question.creatorUsername, fileName));
     } on PlatformException catch (e) {
-      var message = "An error occured, please check your credentials";
-
-      if (e.message != null) {
-        message = e.message;
-      }
-      print(message);
+      throw e;
     } catch (e) {
       throw e;
     }
   }
 
-  Future<void> updateQuestion(documentId, Map<String, dynamic> data) async {
+  Future<bool> checkAnswer(documentId) async {
+    bool flag = false;
+    await Firestore.instance
+        .collection("questions")
+        .document(documentId)
+        .get()
+        .then((value) => flag = value.data["isAnswerAccepted"]);
+    return flag;
+  }
+
+  void updateQuestion(documentId, Map<String, dynamic> data) {
     try {
-      await Firestore.instance
+      Firestore.instance
           .collection("questions")
           .document(documentId)
           .updateData(data);
@@ -60,47 +52,61 @@ class QuestionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteQuestion(documentId) async {
+  void deleteQuestion(documentId, imageUrl, resultImageUrl) {
     try {
-      await Firestore.instance
-          .collection("questions")
-          .document(documentId)
-          .delete();
+      Firestore.instance.collection("questions").document(documentId).delete();
+
+      FirebaseStorage.instance
+          .getReferenceFromUrl(imageUrl)
+          .then((value) => value.delete());
+
+      if (resultImageUrl != null) {
+        FirebaseStorage.instance
+            .getReferenceFromUrl(resultImageUrl)
+            .then((value) => value.delete());
+      }
     } catch (e) {
       throw e;
     }
   }
 
-  Future<void> addQuestionResult(documentId, File resultImage) async {
+  Future<void> addQuestionResult(documentId, File resultImage, fileName) async {
     try {
       final user = await FirebaseAuth.instance.currentUser();
       final ref = FirebaseStorage.instance
           .ref()
           .child("question_images")
           .child(user.uid)
-          .child(Timestamp.now().nanoseconds.toString() + "-result.jpg");
+          .child(fileName + "-result");
 
       await ref.putFile(resultImage).onComplete;
 
       final url = await ref.getDownloadURL();
-      await Firestore.instance
+      Firestore.instance
           .collection("questions")
           .document(documentId)
           .updateData({
         "resultImageUrl": url,
-        "resultFile": resultImage.path,
       });
     } catch (e) {
       throw e;
     }
   }
 
-  Future<void> fetchAndSetQuestionsLocal(String selectedFilter) async {
-    final dataList = await DBHelper.getData("questions");
-    _items = dataList.map((item) => Question.fromJsonLocal(item)).toList();
+  Future<Question> getQuestionByDocId(docId) async {
+    Question data;
+    await Firestore.instance
+        .collection("questions")
+        .document(docId)
+        .get()
+        .then((value) {
+      data = Question.fromJson(value.data);
+    });
+    return data;
   }
 
-  Stream<QuerySnapshot> fetchAndSetQuestions(String selectedFilter, String lessonName) {
+  Stream<QuerySnapshot> fetchAndSetQuestions(
+      String selectedFilter, String lessonName) {
     try {
       final allDocs = Firestore.instance
           .collection("questions")

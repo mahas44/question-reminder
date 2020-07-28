@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:question_reminders/colors.dart';
 import 'package:question_reminders/connectivity_status.dart';
-import 'package:question_reminders/constant.dart';
 import 'package:question_reminders/models/question.dart';
 import 'package:question_reminders/providers/question_provider.dart';
-import 'package:question_reminders/widgets/comment_list.dart';
-import '../helpers/notification_manager.dart';
+import 'package:question_reminders/widgets/comment/comment_list.dart';
+import '../../helpers/notification_manager.dart';
 import 'package:flip_card/flip_card.dart';
 import 'dart:io';
+
+var format = DateFormat("d MMM y HH:mm", "tr_TR");
 
 class QuestionItem extends StatefulWidget {
   final Question question;
   final String questionDocumentID;
   final String type;
+  final String secondType;
   QuestionItem({
     this.question,
     this.questionDocumentID,
     this.type,
+    this.secondType,
   });
 
   @override
@@ -26,9 +30,25 @@ class QuestionItem extends StatefulWidget {
 }
 
 class _QuestionItemState extends State<QuestionItem> {
-  double cardHeight = 400;
+  double cardHeight;
   var connectionStatus;
   File _storedImage;
+
+  @override
+  Widget build(BuildContext context) {
+    connectionStatus = Provider.of<ConnectivityStatus>(context);
+    cardHeight = MediaQuery.of(context).size.height * 0.5;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: FlipCard(
+        front: Container(
+          height: cardHeight,
+          child: buildFrontCard(context),
+        ),
+        back: Container(height: cardHeight, child: buildBackCard()),
+      ),
+    );
+  }
 
   Future<void> _takePicture(String sourceType) async {
     final picker = ImagePicker();
@@ -44,8 +64,8 @@ class _QuestionItemState extends State<QuestionItem> {
       _storedImage = File(imageFile.path);
     });
 
-    Provider.of<QuestionProvider>(context, listen: false)
-        .addQuestionResult(widget.questionDocumentID, _storedImage);
+    Provider.of<QuestionProvider>(context, listen: false).addQuestionResult(
+        widget.questionDocumentID, _storedImage, widget.question.fileName);
   }
 
   Future showDialogForImage(BuildContext context) {
@@ -81,13 +101,22 @@ class _QuestionItemState extends State<QuestionItem> {
   void _showComments(BuildContext ctx) {
     showModalBottomSheet(
       context: ctx,
-      builder: (_) {
-        return GestureDetector(
-          child: CommentList(widget.question.id, widget.questionDocumentID),
-
-          // : CommentListLocal(widget.question.id),
-          onTap: () {},
-          behavior: HitTestBehavior.opaque,
+      isScrollControlled: true,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+          ),
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: CommentList(
+            widget.question,
+            widget.questionDocumentID,
+            type: widget.secondType,
+          ),
         );
       },
     );
@@ -189,29 +218,14 @@ class _QuestionItemState extends State<QuestionItem> {
               child: Text("Evet"),
               onPressed: () {
                 Provider.of<QuestionProvider>(context, listen: false)
-                    .deleteQuestion(widget.questionDocumentID);
+                    .deleteQuestion(
+                        widget.questionDocumentID, widget.question.imageUrl, widget.question.resultImageUrl);
                 Navigator.of(context).pop();
               },
             )
           ],
         );
       },
-    );
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    connectionStatus = Provider.of<ConnectivityStatus>(context);
-    cardHeight = MediaQuery.of(context).size.height * 0.7;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: FlipCard(
-        front: Container(
-          height: cardHeight,
-          child: buildFrontCard(context),
-        ),
-        back: buildBackCard(),
-      ),
     );
   }
 
@@ -222,8 +236,8 @@ class _QuestionItemState extends State<QuestionItem> {
       ),
       clipBehavior: Clip.antiAlias,
       child: connectionStatus == ConnectivityStatus.Offline
-          ? Image.memory(
-              widget.question.imageFile.readAsBytesSync(),
+          ? Image.asset(
+              "assets/icon.png",
               width: double.infinity,
               fit: BoxFit.fill,
             )
@@ -236,22 +250,37 @@ class _QuestionItemState extends State<QuestionItem> {
   }
 
   Widget buildBackCard() {
-    return Container(
-      height: cardHeight,
-      child: Card(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: widget.question.resultImageUrl != null
-              ? Image.network(
-                  widget.question.resultImageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                )
-              : Image.asset(
-                  "assets/icon.png",
-                  width: double.infinity,
-                ),
+    return GridTile(
+      header: Material(
+        elevation: 8,
+        color: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(4),
+          ),
         ),
+        clipBehavior: Clip.antiAlias,
+        child: GridTileBar(
+          title: Text("Çözüm"),
+          backgroundColor: Colors.black38,
+        ),
+      ),
+      child: Material(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+        color: Colors.black12,
+        clipBehavior: Clip.antiAlias,
+        child: widget.question.resultImageUrl != null
+            ? Image.network(
+                widget.question.resultImageUrl,
+                width: double.infinity,
+                fit: BoxFit.contain,
+              )
+            : Image.asset(
+                "assets/icon.png",
+                width: double.infinity,
+              ),
       ),
     );
   }
@@ -259,6 +288,7 @@ class _QuestionItemState extends State<QuestionItem> {
   GridTile buildFrontCard(BuildContext context) {
     return GridTile(
       footer: Material(
+        elevation: 8,
         color: Colors.transparent,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -318,7 +348,7 @@ class _QuestionItemState extends State<QuestionItem> {
         trailing: Row(
           children: <Widget>[
             _flatButton(),
-            if (widget.type == "my") menuItem(context),
+            if (widget.secondType != "look") menuItem(context),
           ],
         ));
   }
@@ -342,13 +372,14 @@ class _QuestionItemState extends State<QuestionItem> {
         }
       },
       itemBuilder: (context) => <PopupMenuEntry<String>>[
-        PopupMenuItem(
-          value: "Alarm Ekle",
-          child: ListTile(
-            leading: const Icon(Icons.add_alert),
-            title: Text("Alarm Ekle"),
+        if (widget.type == "my")
+          PopupMenuItem(
+            value: "Alarm Ekle",
+            child: ListTile(
+              leading: const Icon(Icons.add_alert),
+              title: Text("Alarm Ekle"),
+            ),
           ),
-        ),
         PopupMenuItem(
           value: "Cevap Ekle",
           child: ListTile(

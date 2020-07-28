@@ -8,27 +8,27 @@ class ExamItem extends StatelessWidget {
   ExamItem(this.id, this.exam, this.color);
 
   void selectExam(BuildContext context) {
-    // Navigator.of(context).pushNamed(
-    //   ExamLessonsScreen.routeName,
-    //   arguments: exam
-    // );
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ExamLessonsScreen(examTitle: exam,),));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ExamLessonsScreen(
+          examTitle: exam,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return InkWell(
       onTap: () => selectExam(context),
       splashColor: Theme.of(context).primaryColor,
       borderRadius: BorderRadius.circular(20),
       child: Container(
         alignment: Alignment.center,
-        padding: const EdgeInsets.all(10),
         child: Text(
           exam,
           style: Theme.of(context).textTheme.headline6,
-          textAlign: TextAlign.center,
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(

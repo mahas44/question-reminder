@@ -11,10 +11,7 @@ class DBHelper {
             "(id TEXT PRIMARY KEY, description TEXT, imageUrl TEXT," +
             "lesson TEXT, exam TEXT, dateTime INTEGER," +
             "isAlarmActive INTEGER, alarmDate INTEGER, imageFile TEXT," +
-            "creatorId TEXT, creatorUsername TEXT, resultImageUrl TEXT, resultFile TEXT)");
-        db.execute("CREATE TABLE comments" +
-            "(id INTEGER PRIMARY KEY,  comment TEXT, createdAt INTEGER," +
-            "createdBy TEXT, creatorUsername TEXT, score INTEGER, questionId TEXT)");
+            "creatorId TEXT, creatorUsername TEXT, resultImageUrl TEXT, resultFile TEXT, isAnswerAccepted INTEGER)");
       },
       version: 1,
     );
@@ -34,13 +31,4 @@ class DBHelper {
     return db.query(table);
   }
 
-  static Future<List<Map<String, dynamic>>> getCommentByQuestionId(
-      String table, String questionId) async {
-    final db = await DBHelper.database();
-    return db.query(
-      table,
-      where: "questionId = ?",
-      whereArgs: [questionId],
-    );
-  }
 }

@@ -47,11 +47,16 @@ class _NewCommentsState extends State<NewComment> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          border: Border.all(color: Colors.grey)),
       padding: EdgeInsets.only(
-        top: 10,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 10,
-        left: 10,
-        right: 10,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 4,
+        left: 8,
+        right: 8,
       ),
       child: Row(
         children: [
@@ -63,6 +68,7 @@ class _NewCommentsState extends State<NewComment> {
                 controller: _controller,
                 textCapitalization: TextCapitalization.sentences,
                 autocorrect: true,
+                style: TextStyle(color: Colors.black),
                 enableSuggestions: true,
                 decoration: InputDecoration(labelText: "Yorum veya cevap yaz"),
                 onChanged: (value) {

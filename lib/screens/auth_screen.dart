@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:question_reminders/colors.dart';
-import '../widgets/auth_form.dart';
+import '../widgets/auth/auth_form.dart';
 import 'package:flutter/services.dart';
 import 'dart:math';
-
+const Roles = ["User", "Moderator", "Admin"];
 class AuthScreen extends StatefulWidget {
   @override
   _AuthScreenState createState() => _AuthScreenState();
@@ -26,27 +26,25 @@ class _AuthScreenState extends State<AuthScreen> {
     bool isLogin,
     BuildContext ctx,
   ) async {
-    AuthResult authResult;
 
     try {
       setState(() {
         _isLoading = true;
       });
       if (isLogin) {
-        authResult = await _auth.signInWithEmailAndPassword(
+        await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
       } else {
-        authResult = await _auth.createUserWithEmailAndPassword(
+        AuthResult authResult = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
-
         final ref = FirebaseStorage.instance
             .ref()
             .child("user_images")
-            .child(authResult.user.uid + ".jpg");
+            .child(authResult.user.uid);
 
         await ref.putFile(image).onComplete;
 
@@ -59,6 +57,8 @@ class _AuthScreenState extends State<AuthScreen> {
           "username": username,
           "email": email,
           "imageUrl": url,
+          "role": Roles.elementAt(0),
+          "description": "None",
         });
       }
     } on PlatformException catch (error) {

@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import '../models/comment.dart';
 
 class CommentProvider with ChangeNotifier {
-  Future<void> addComment(Comment comment, questionDocumentID, questionId) async {
+  Future<void> addComment(
+      Comment comment, questionDocumentID, questionId) async {
     try {
       await Firestore.instance
           .collection("questions")
@@ -23,7 +24,8 @@ class CommentProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteComment(commentDocumentId, questionDocumentID, commentId) async {
+  Future<void> deleteComment(
+      commentDocumentId, questionDocumentID, commentId) async {
     try {
       await Firestore.instance
           .collection("questions")
@@ -47,6 +49,34 @@ class CommentProvider with ChangeNotifier {
           .snapshots();
       return allDocs;
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> setAnswerComment(questionDocId, commentDocId, data) async {
+     try {
+      await Firestore.instance
+          .collection("questions")
+          .document(questionDocId)
+          .collection("comments")
+          .document(commentDocId)
+          .updateData(data);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future getAnswerComment(questionDocId) async{
+    var query = await Firestore.instance
+        .collection("questions")
+        .document(questionDocId)
+        .collection("comments")
+        .where("isAnswer", isEqualTo: true)
+        .limit(1)
+        .getDocuments();
+    if (query.documents.length > 0) {
+      return query.documents[0];
+    } else {
       return null;
     }
   }

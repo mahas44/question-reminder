@@ -88,7 +88,7 @@ class _AuthFormState extends State<AuthForm>
                   color: kShrineBrown900,
                   child: TextFormField(
                     key: ValueKey("email"),
-                    autocorrect: false,
+                    style: TextStyle(color: Colors.black),
                     textCapitalization: TextCapitalization.none,
                     enableSuggestions: false,
                     validator: (value) {
@@ -115,7 +115,7 @@ class _AuthFormState extends State<AuthForm>
                   color: kShrineBrown900,
                   child: TextFormField(
                     key: ValueKey("username"),
-                    autocorrect: true,
+                    style: TextStyle(color: Colors.black),
                     textCapitalization: TextCapitalization.sentences,
                     enableSuggestions: true,
                     validator: (value) {
@@ -140,6 +140,7 @@ class _AuthFormState extends State<AuthForm>
                   color: kShrineBrown900,
                   child: TextFormField(
                     key: ValueKey("password"),
+                    style: TextStyle(color: Colors.black),
                     controller: _passwordController,
                     validator: (value) {
                       if (value.isEmpty || value.length < 7) {
@@ -165,6 +166,7 @@ class _AuthFormState extends State<AuthForm>
                     color: kShrineBrown900,
                     child: TextFormField(
                       key: ValueKey("confirmPassword"),
+                      style: TextStyle(color: Colors.black),
                       validator: (value) {
                         if (value != _passwordController.text) {
                           return "Şifreniz eşleşmeli.";

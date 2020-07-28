@@ -9,6 +9,7 @@ class Comment {
   final String creatorImage;
   final int score;
   List<String> scoredBy;
+  final bool isAnswer;
 
   Comment({
     @required this.id,
@@ -19,17 +20,19 @@ class Comment {
     @required this.creatorImage,
     this.score = 0,
     this.scoredBy,
+    this.isAnswer = false,
   });
 
-  Comment.fromJson(Map<String, dynamic> parsedJson)
-      : id = parsedJson["id"],
-        comment = parsedJson["comment"],
-        createdAt = parsedJson["createdAt"],
-        createdBy = parsedJson["createdBy"],
-        creatorUsername = parsedJson["creatorUsername"],
-        creatorImage = parsedJson["creatorImage"],
-        score = parsedJson["score"],
-        scoredBy = parsedJson["scoredBy"];
+  Comment.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        comment = json["comment"],
+        createdAt = json["createdAt"],
+        createdBy = json["createdBy"],
+        creatorUsername = json["creatorUsername"],
+        creatorImage = json["creatorImage"],
+        score = json["score"],
+        scoredBy = json["scoredBy"],
+        isAnswer = json["isAnswer"] == null ? false : json["isAnswer"];
         
 
   Map<String, dynamic> toJson() => {
@@ -41,6 +44,7 @@ class Comment {
         "creatorImage": creatorImage,
         "score": score,
         "scoredBy": scoredBy,
+        "isAnswer": isAnswer,
       };
 
 
